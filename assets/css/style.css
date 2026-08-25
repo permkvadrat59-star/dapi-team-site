@@ -46,6 +46,56 @@ body {
   line-height: 1.5;
 }
 
+/* ---------- Grain overlay ---------- */
+/* Подсмотрено у hobro.digital: тонкое зерно поверх всего сайта — дёшево по перфомансу
+   (один SVG-шум через data URI), но сильно поднимает ощущение "премиальности". */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Custom cursor ---------- */
+/* Отключается сам на тач-устройствах (см. main.js) и уважает prefers-reduced-motion. */
+
+.cursor-dot, .cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 95;
+  pointer-events: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+.cursor-dot { width: 6px; height: 6px; background: var(--pine); }
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--pine);
+  opacity: 0.55;
+  transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+}
+.cursor-ring.is-active { width: 54px; height: 54px; opacity: 0.9; background: rgba(59, 87, 69, 0.06); }
+body.has-custom-cursor, body.has-custom-cursor a, body.has-custom-cursor button { cursor: none; }
+
+/* ---------- Scroll reveal ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
 img { max-width: 100%; display: block; }
 
 a { color: inherit; text-decoration: none; }
@@ -301,35 +351,75 @@ section.tight { padding: 56px 0; }
 .benefit.highlight .benefit-title { color: var(--pine-soft); }
 .benefit.highlight p { color: rgba(232, 240, 230, 0.85); }
 
-/* ---------- Services teaser ---------- */
+/* ---------- "Что делаем" — kinetic split section (в духе hobro.digital) ---------- */
 
-.services-grid {
+.whatwedo {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+@media (max-width: 780px) { .whatwedo { grid-template-columns: 1fr; gap: 28px; } }
+
+.whatwedo-heading {
+  font-size: clamp(44px, 6vw, 84px);
+  line-height: 0.94;
+  margin: 0;
+}
+.whatwedo-heading em {
+  display: block;
+  font-family: "Georgia", "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  color: var(--ink-soft);
+  font-size: 0.5em;
+  letter-spacing: 0;
+}
+
+.whatwedo-list { list-style: none; margin: 0; padding: 0; }
+.whatwedo-list li {
+  border-top: 1px solid var(--stone);
+  padding: 18px 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
   gap: 16px;
 }
-@media (max-width: 900px) { .services-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .services-grid { grid-template-columns: 1fr; } }
-
-.service-card {
-  padding: 26px 22px;
-  border: 1px solid var(--stone);
-  border-radius: var(--radius);
-  background: var(--surface);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.service-card.design { background: var(--pine-soft); border-color: var(--pine); }
-.service-card h3 {
+.whatwedo-list li:last-child { border-bottom: 1px solid var(--stone); }
+.whatwedo-list b {
   font-family: "Berier", sans-serif;
   font-weight: 800;
   text-transform: uppercase;
-  font-size: 17px;
-  margin: 0;
+  font-size: 15px;
 }
-.service-card p { margin: 0; font-size: 13px; color: var(--ink-soft); flex: 1; }
-.service-card .btn-ghost { align-self: flex-start; padding: 8px 16px; font-size: 12.5px; }
+.whatwedo-list span { font-size: 12.5px; color: var(--ink-soft); text-align: right; }
+.whatwedo-list li.soon { opacity: 0.55; }
+
+/* ---------- Core vision — full-bleed philosophy section ---------- */
+
+.core-vision {
+  position: relative;
+  min-height: 62vh;
+  display: flex;
+  align-items: flex-end;
+  background: linear-gradient(0deg, rgba(20, 23, 15, 0.86) 0%, rgba(20, 23, 15, 0.86) 100%),
+    url("../images/hero-loading.jpg") center 80%/cover no-repeat;
+  color: #F1F4EC;
+  padding: 0 0 64px;
+}
+.core-vision-inner { max-width: 720px; }
+.core-vision .eyebrow { color: var(--sand); }
+.core-vision .eyebrow::before { background: var(--sand); }
+.core-vision h2 {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  font-size: clamp(28px, 4.5vw, 46px);
+  margin: 0 0 16px;
+}
+.core-vision p { color: rgba(241, 244, 236, 0.82); font-size: 15.5px; max-width: 56ch; margin: 0; }
 
 /* ---------- Cases teaser ---------- */
 
@@ -366,6 +456,35 @@ section.tight { padding: 56px 0; }
   margin: 0 0 6px;
 }
 .case-audience { font-size: 13px; color: var(--ink-soft); margin: 0; }
+
+.cases-grid { position: relative; }
+
+.case-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  width: 160px;
+  height: 110px;
+  border-radius: var(--radius);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.9);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Berier", sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 13px;
+  color: #F1F4EC;
+  text-align: center;
+  padding: 10px;
+  box-shadow: 0 12px 28px rgba(32, 36, 29, 0.22);
+}
+.case-preview.is-visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+@media (hover: none) { .case-preview { display: none; } }
 
 /* ---------- Manifesto ---------- */
 
