@@ -1,12 +1,73 @@
-// Экран загрузки: скрываем после полной загрузки страницы.
+// Хиро: заголовок разбирается на буквы и собирается заново через GSAP —
+// вдохновлено тем, как hobro.digital анимирует буквы своего логотипа (там
+// это отдельные SVG + платный SplitText, у нас — свой сплит + бесплатный
+// GSAP core, без клубных плагинов).
+function playHeroReveal() {
+  var title = document.getElementById("heroTitle");
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var fadeEls = [
+    document.getElementById("heroEyebrow"),
+    document.getElementById("heroText"),
+    document.getElementById("heroCta"),
+    document.getElementById("heroStats"),
+  ].filter(Boolean);
+
+  if (reduceMotion || typeof gsap === "undefined") {
+    fadeEls.forEach(function (el) { el.style.opacity = 1; });
+    return;
+  }
+
+  var chars = [];
+  if (title) {
+    Array.prototype.slice.call(title.childNodes).forEach(function (node) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        var frag = document.createDocumentFragment();
+        node.textContent.split("").forEach(function (ch) {
+          var span = document.createElement("span");
+          span.className = "char";
+          span.textContent = ch;
+          frag.appendChild(span);
+          chars.push(span);
+        });
+        title.replaceChild(frag, node);
+      }
+    });
+  }
+
+  gsap.set(fadeEls, { y: 16 });
+
+  var tl = gsap.timeline();
+  if (chars.length) {
+    tl.from(chars, {
+      opacity: 0,
+      y: 46,
+      rotate: 6,
+      duration: 0.8,
+      ease: "power4.out",
+      stagger: 0.026,
+    });
+  }
+  tl.to(
+    fadeEls,
+    { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", stagger: 0.08 },
+    chars.length ? "-=0.35" : 0
+  );
+}
+
+// Экран загрузки: скрываем после полной загрузки страницы, следом запускаем
+// анимацию хиро, чтобы буквы появлялись сразу за исчезновением экрана.
 (function () {
   var screen = document.getElementById("loadingScreen");
-  if (!screen) return;
-
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function hide() {
-    screen.classList.add("is-hidden");
+    if (screen) screen.classList.add("is-hidden");
+    playHeroReveal();
+  }
+
+  if (!screen) {
+    playHeroReveal();
+    return;
   }
 
   if (reduceMotion) {
@@ -15,7 +76,7 @@
   }
 
   window.addEventListener("load", function () {
-    setTimeout(hide, 500);
+    setTimeout(hide, 400);
   });
 })();
 

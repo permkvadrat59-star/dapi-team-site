@@ -7,6 +7,7 @@
 <meta name="description" content="DAPI TEAM — синергия вайб-кодеров, программистов и дизайнеров. Делаем сайты и приложения для тех, кто строит большой продукт.">
 <link rel="icon" href="assets/images/logo-mark.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/css/style.css">
+<script>document.documentElement.classList.add("js-anim-ready");</script>
 </head>
 <body>
 
@@ -46,11 +47,11 @@
   <section class="hero">
     <div class="wrap">
       <div class="hero-content">
-        <p class="eyebrow">Веб-студия</p>
-        <h1 class="display">Быстро.<br>Стильно.<br>Безопасно.</h1>
-        <p>Синергия вайб-кодеров, программистов и дизайнеров. Делаем сайты и приложения для тех, кто строит большой продукт и хочет расти.</p>
-        <a class="btn" href="https://t.me/Paltus10" target="_blank" rel="noopener">Обсудить проект →</a>
-        <div class="hero-stats">
+        <p class="eyebrow hero-fade" id="heroEyebrow">Веб-студия</p>
+        <h1 class="display" id="heroTitle">Быстро.<br>Стильно.<br>Безопасно.</h1>
+        <p class="hero-fade" id="heroText">Синергия вайб-кодеров, программистов и дизайнеров. Делаем сайты и приложения для тех, кто строит большой продукт и хочет расти.</p>
+        <a class="btn hero-fade" id="heroCta" href="https://t.me/Paltus10" target="_blank" rel="noopener">Обсудить проект →</a>
+        <div class="hero-stats hero-fade" id="heroStats">
           <div><b>от 100 тыс ₽</b><span>старт проекта</span></div>
           <div><b>от 3 дней</b><span>срок запуска</span></div>
           <div><b>6</b><span>реализованных кейсов</span></div>
@@ -225,6 +226,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="assets/js/main.js"></script>
 </body>
 </html>
