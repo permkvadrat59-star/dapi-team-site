@@ -1,4 +1,27 @@
-// DAPI — топбар-меню (заглушка) и переключение хиро по нижним плашкам
+// DAPI — топбар-меню (заглушка), переключение хиро по нижним плашкам
+// и туманный reveal хиро при загрузке страницы
+
+(function () {
+  const root = document.documentElement;
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (reduceMotion) return; // база уже видна и статична — анимацию не запускаем
+
+  // двойной rAF: даём браузеру отрисовать «дождевую» стартовую позицию
+  // (заданную CSS через .js-anim-ready) перед тем, как включить переход
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      root.classList.add("is-revealing");
+    });
+  });
+
+  // самый долгий переход — у плашки 04 (0.92s задержка + 0.6s анимация)
+  setTimeout(() => {
+    root.classList.remove("is-revealing");
+    root.classList.add("is-revealed");
+  }, 1600);
+})();
 
 (function () {
   const menuBtn = document.getElementById("menuBtn");

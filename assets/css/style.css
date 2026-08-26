@@ -256,17 +256,14 @@ a { color: inherit; text-decoration: none; }
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 28px;
   z-index: 5;
 }
 
 .hero-tiles {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  background: var(--surface);
-  box-shadow: 0 -16px 40px var(--shadow);
-  border-radius: var(--radius) var(--radius) 0 0;
-  overflow: hidden;
+  gap: 16px;
 }
 
 .tile {
@@ -274,16 +271,54 @@ a { color: inherit; text-decoration: none; }
   flex-direction: column;
   gap: 6px;
   text-align: left;
-  padding: 22px 20px;
-  border: none;
-  border-left: 1px solid var(--stone);
-  background: var(--surface);
+  padding: 22px 20px 20px;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 14px;
+  background: rgba(241, 244, 236, 0.82);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
+  box-shadow: 0 14px 32px var(--shadow);
   cursor: pointer;
-  transition: background 0.25s ease;
+  overflow: hidden;
+  transition: border-radius 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.4s ease,
+    background 0.3s ease;
 }
 
-.tile:first-child { border-left: none; }
-.tile:hover { background: var(--bg); }
+.tile::after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--tile-accent, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.tile[data-tint="sky"] { --tile-accent: var(--sky); }
+.tile[data-tint="sand"] { --tile-accent: var(--sand); }
+.tile[data-tint="pine"] { --tile-accent: var(--pine); }
+.tile[data-tint="stone"] { --tile-accent: var(--ink-soft); }
+
+.tile:hover,
+.tile:focus-visible {
+  border-radius: 28px;
+  transform: translateY(-5px);
+  box-shadow: 0 22px 44px var(--shadow);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.tile.is-active {
+  background: var(--surface);
+}
+
+.tile.is-active::after { transform: scaleX(1); }
 
 .tile[data-tint="sky"].is-active { background: var(--sky-soft); }
 .tile[data-tint="sand"].is-active { background: var(--sand-soft); }
@@ -313,16 +348,64 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.4;
 }
 
+/* ---------- Hero entrance reveal ---------- */
+
+.mist-band {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mist-band-1 { z-index: 6; background: var(--stone); }
+.mist-band-2 { z-index: 7; background: var(--sky-soft); }
+.mist-band-3 { z-index: 8; background: var(--bg); }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* pre-reveal: mist opaque, topbar + tiles hidden — only while JS is armed */
+  html.js-anim-ready .mist-band { opacity: 1; }
+  html.js-anim-ready .topbar { opacity: 0; transform: translateY(-14px); }
+  html.js-anim-ready .hero-tiles .tile { opacity: 0; transform: translateY(24px); }
+
+  /* is-revealing: the one-shot staggered transition (JS removes this class
+     once it finishes, so its transition-delay never lingers on later hovers) */
+  html.js-anim-ready.is-revealing .mist-band {
+    transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+  }
+  html.js-anim-ready.is-revealing .mist-band-3 { transform: translateY(-100%); opacity: 0; transition-delay: 0ms; }
+  html.js-anim-ready.is-revealing .mist-band-2 { transform: translateY(-100%); opacity: 0; transition-delay: 140ms; }
+  html.js-anim-ready.is-revealing .mist-band-1 { transform: translateY(-100%); opacity: 0; transition-delay: 280ms; }
+
+  html.js-anim-ready.is-revealing .topbar {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.6s ease 0.5s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+  }
+
+  html.js-anim-ready.is-revealing .hero-tiles .tile {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  html.js-anim-ready.is-revealing .hero-tiles .tile:nth-child(1) { transition-delay: 0.68s; }
+  html.js-anim-ready.is-revealing .hero-tiles .tile:nth-child(2) { transition-delay: 0.76s; }
+  html.js-anim-ready.is-revealing .hero-tiles .tile:nth-child(3) { transition-delay: 0.84s; }
+  html.js-anim-ready.is-revealing .hero-tiles .tile:nth-child(4) { transition-delay: 0.92s; }
+
+  /* is-revealed: permanent resting state, no leftover delay — hover/active
+     transitions fall back to the plain untimed rules defined on .topbar/.tile */
+  html.js-anim-ready.is-revealed .mist-band { display: none; }
+  html.js-anim-ready.is-revealed .topbar { opacity: 1; transform: none; }
+  html.js-anim-ready.is-revealed .hero-tiles .tile { opacity: 1; transform: none; }
+}
+
 @media (max-width: 860px) {
   .hero-tiles { grid-template-columns: repeat(2, 1fr); }
-  .tile:nth-child(3) { border-left: none; }
   .topbar-spacer { display: none; }
   .menu-btn-label { display: none; }
 }
 
 @media (max-width: 560px) {
   .hero-tiles { grid-template-columns: 1fr; }
-  .tile { border-left: none !important; border-top: 1px solid var(--stone); }
-  .tile:first-child { border-top: none; }
   .hero-badge { top: 84px; right: 20px; }
 }
