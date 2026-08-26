@@ -63,6 +63,10 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0.02em;
 }
 
+.brand-word {
+  letter-spacing: 8px;
+}
+
 /* ---------- Topbar ---------- */
 
 .topbar {
@@ -117,13 +121,6 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   gap: 10px;
   color: var(--surface);
-}
-
-.brand-mark {
-  width: 26px;
-  height: auto;
-  color: var(--surface);
-  fill: currentColor;
 }
 
 .brand-word {
